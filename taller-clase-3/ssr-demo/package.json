@@ -1,0 +1,17 @@
+{
+  "name": "ssr-demo",
+  "version": "1.0.0",
+  "description": "Prompt uno taller clase 3",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^5.1.0"
+  }
+}
