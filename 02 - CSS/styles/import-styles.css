@@ -1,0 +1,106 @@
+/* ========================================
+   ESTILOS CON @IMPORT
+   ======================================== */
+
+/* Este archivo será importado usando @import en el CSS principal */
+
+/* Estilos para la sección de @import */
+.import-demo {
+    background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.import-demo::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+.import-demo h4 {
+    margin-top: 0;
+    color: #fff;
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+    position: relative;
+    z-index: 1;
+}
+
+.import-demo p {
+    margin-bottom: 10px;
+    line-height: 1.6;
+    position: relative;
+    z-index: 1;
+}
+
+/* Estilos para demostrar la carga de fuentes */
+.import-demo .google-font-demo {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 300;
+    margin: 15px 0;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* Variantes de color para demostrar especificidad */
+.import-color-variants {
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 8px;
+    border-left: 5px solid;
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.import-color-variants.primary {
+    border-left-color: #007BFF;
+    color: #e3f2fd;
+}
+
+.import-color-variants.success {
+    border-left-color: #28A745;
+    color: #e8f5e8;
+}
+
+.import-color-variants.warning {
+    border-left-color: #FFC107;
+    color: #fff8e1;
+}
+
+/* Botones con estilos importados */
+.import-demo .import-button {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 5px;
+    font-weight: 500;
+}
+
+.import-demo .import-button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}

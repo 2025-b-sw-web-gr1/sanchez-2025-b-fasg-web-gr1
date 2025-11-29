@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formas de Cargar CSS - Guía Educativa</title>
+    
+    <!-- ========================================
+         MÉTODO 1: ENLAZAR ARCHIVO EXTERNO (RECOMENDADO)
+         ======================================== -->
+    <link rel="stylesheet" href="styles/external-styles.css">
+    
+    <!-- ========================================
+         MÉTODO 2: @IMPORT EN CSS
+         ======================================== -->
+    <style>
+        /* Este @import carga los estilos desde import-styles.css */
+        @import url('styles/import-styles.css');
+        
+        /* ========================================
+             MÉTODO 3: ESTILOS INTERNOS (EN EL HEAD)
+             ======================================== */
+        
+        /* Variables CSS para consistencia */
+        :root {
+            --primary-color: #007BFF;
+            --secondary-color: #6C757D;
+            --success-color: #28A745;
+            --warning-color: #FFC107;
+            --error-color: #DC3545;
+            --bg-light: #F8F9FA;
+            --text-dark: #343A40;
+            --border-radius: 8px;
+            --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Estilos base del documento */
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.7;
+            color: var(--text-dark);
+            background-color: var(--bg-light);
+            margin: 0;
+            padding: 0;
+        }
+        
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0 32px;
+        }
+        
+        /* Tipografía */
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 1rem;
+            color: #212529;
+            line-height: 1.2;
+        }
+        
+        h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: #212529;
+            line-height: 1.3;
+        }
+        
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #343A40;
+            line-height: 1.4;
+        }
+        
+        h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: #495057;
+        }
+        
+        p {
+            font-size: 1.125rem;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+        
+        /* Layout y espaciado */
+        .section {
+            background: white;
+            padding: 2rem;
+            margin: 2rem 0;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(50, 50, 93, 0.08);
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 6rem 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 0;
+            margin: 0;
+            margin-bottom: 3rem;
+        }
+        
+        .hero h1 {
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero p {
+            font-size: 1.25rem;
+            max-width: 600px;
+            margin: 0 auto;
+            opacity: 0.95;
+        }
+        
+        /* Bloques de código */
+        .code-block {
+            background: #212529;
+            color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            line-height: 1.6;
+        }
+        
+        .code-block code {
+            color: #e9ecef;
+        }
+        
+        .code-block .comment {
+            color: #6c757d;
+        }
+        
+        .code-block .tag {
+            color: #fd7e14;
+        }
+        
+        .code-block .attribute {
+            color: #20c997;
+        }
+        
+        .code-block .value {
+            color: #f8f9fa;
+        }
+        
+        /* Botones de demostración */
+        .demo-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+            margin: 10px 5px;
+        }
+        
+        .demo-button:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+        }
+        
+        /* Elementos de demostración */
+        .demo-element {
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: var(--border-radius);
+            border: 2px solid #dee2e6;
+            transition: all 0.3s ease;
+        }
+        
+        .demo-element:hover {
+            box-shadow: var(--box-shadow);
+            transform: translateY(-1px);
+        }
+        
+        /* Ejemplo de especificidad */
+        .specificity-demo {
+            display: grid;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .specificity-item {
+            padding: 15px;
+            border-radius: var(--border-radius);
+            border-left: 5px solid;
+            background: #f8f9fa;
+        }
+        
+        .specificity-item.inline {
+            border-left-color: var(--error-color);
+            background: #fff5f5;
+        }
+        
+        .specificity-item.internal {
+            border-left-color: var(--warning-color);
+            background: #fffbf0;
+        }
+        
+        .specificity-item.external {
+            border-left-color: var(--success-color);
+            background: #f0fff4;
+        }
+        
+        /* Alertas informativas */
+        .info-box {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .info-box h4 {
+            color: #1565c0;
+            margin-top: 0;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .warning-box h4 {
+            color: #856404;
+            margin-top: 0;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 24px;
+            }
+            
+            h1 {
+                font-size: 2.25rem;
+            }
+            
+            h2 {
+                font-size: 1.75rem;
+            }
+            
+            .hero {
+                padding: 4rem 0;
+            }
+            
+            .section {
+                padding: 1.5rem;
+                margin: 1.5rem 0;
+            }
+        }
+        
+        /* ========================================
+             ESTILOS PARA MÉTODOS ESPECÍFICOS
+             ======================================== */
+        
+        /* Demo de estilos inline */
+        .inline-example {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        /* Demo de estilos internos */
+        .internal-example {
+            background: linear-gradient(45deg, #4834d4, #686de0);
+            color: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .boton-ejemplo{
+          background-color: blue;
+          animation-name: botonEjemploAnimacion;
+            animation-duration: 4s;
+          animation-iteration-count: infinite;
+        }
+
+        .boton-secundario{
+          background-color: orange;
+          animation-name: botonSecundarioAnimacion;
+            animation-duration: 6s;
+          animation-iteration-count: infinite;
+        }
+
+        /* The animation code */
+@keyframes botonEjemploAnimacion{
+  from {background-color: red;}
+  to {background-color: yellow;}
+}
+
+      @keyframes botonSecundarioAnimacion{
+  0%   {background-color: red;}
+  25%  {background-color: yellow;}
+  50%  {background-color: blue;}
+  100% {background-color: green;}
+}
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="container">
+            <h1>Formas de Cargar CSS</h1>
+            <p>Una guía completa y educativa sobre todos los métodos para incluir estilos en tus páginas web</p>
+        </div>
+    </div>
+
+    <div class="container">
+        
+        <!-- Introducción -->
+        <section class="section">
+            <h2>Introducción</h2>
+            <p>CSS (Cascading Style Sheets) puede cargarse en una página web de varias maneras. Cada método tiene sus ventajas, desventajas y casos de uso específicos. En esta guía exploraremos todas las opciones disponibles.</p>
+            
+            <div class="info-box">
+                <h4>¿Por qué es importante conocer estos métodos?</h4>
+                <p>Conocer las diferentes formas de cargar CSS te permite optimizar el rendimiento, mantener mejor tu código y resolver problemas de especificidad y cascada de estilos.</p>
+            </div>
+        </section>
+
+        <!-- Método 1: Estilos Inline -->
+        <section class="section">
+            <h2>Método 1: Estilos Inline</h2>
+            <p>Los estilos inline se aplican directamente a los elementos HTML usando el atributo <code>style</code>. Este método tiene la mayor especificidad y se aplica inmediatamente.</p>
+            
+            <div class="code-block">
+<code><span class="comment">&lt;!-- Ejemplo de estilo inline --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attribute">style</span>=<span class="value">"color: red; font-size: 18px; padding: 10px;"</span><span class="tag">&gt;</span>
+    Este texto tiene estilos inline
+<span class="tag">&lt;/div&gt;</span></code>
+            </div>
+            
+            <div class="demo-element inline-example" style="background: linear-gradient(45deg, #ff6b6b, #ee5a24); color: white; padding: 20px; border-radius: 8px; text-align: center;">
+                <h4>Ejemplo de Estilo Inline</h4>
+                <p>Este elemento tiene estilos aplicados directamente con el atributo <code>style</code></p>
+                <button class="demo-button" style="background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.4);">Botón con estilo inline</button>
+          <button class="boton-ejemplo">otro botón de prueba</button>
+          <button class="boton-secundario">botón secundario</button>
+            </div>
+            
+            <div class="warning-box">
+                <h4>⚠️ Consideraciones</h4>
+                <ul>
+                    <li><strong>Especificidad máxima:</strong> Los estilos inline sobreescriben cualquier otro método</li>
+                    <li><strong>No reutilizable:</strong> Cada elemento debe tener sus estilos individuales</li>
+                    <li><strong>Difícil de mantener:</strong> Cambios requieren editar cada elemento</li>
+                    <li><strong>Casos de uso:</strong> Estilos únicos, debugging, aplicaciones de una sola página</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Método 2: Estilos Internos -->
+        <section class="section">
+            <h2>Método 2: Estilos Internos (en el &lt;head&gt;)</h2>
+            <p>Los estilos internos se declaran dentro de etiquetas <code>&lt;style&gt;</code> en la sección <code>&lt;head&gt;</code> del documento. Son específicos de esa página.</p>
+            
+            <div class="code-block">
+<code><span class="comment">&lt;!-- Estilos internos en el head --&gt;</span>
+<span class="tag">&lt;style&gt;</span>
+<span class="tag">.mi-clase</span> {
+    <span class="attribute">color</span>: <span class="value">blue</span>;
+    <span class="attribute">font-size</span>: <span class="value">16px</span>;
+    <span class="attribute">margin</span>: <span class="value">10px 0</span>;
+}
+<span class="tag">&lt;/style&gt;</span></code>
+            </div>
+            
+            <div class="demo-element internal-example">
+                <h4>Ejemplo de Estilos Internos</h4>
+                <p>Los estilos internos están definidos en la etiqueta &lt;style&gt; del head</p>
+                <p>Pueden usar selectores CSS completos (clases, IDs, elementos)</p>
+                <button class="demo-button">Botón con estilos internos</button>
+            </div>
+            
+            <div class="info-box">
+                <h4>Ventajas de los estilos internos</h4>
+                <ul>
+                    <li><strong>Reutilizables:</strong> Puedes aplicar la misma clase a múltiples elementos</li>
+                    <li><strong>Organizados:</strong> Están centralizados en el head</li>
+                    <li><strong>Rápidos:</strong> No requieren peticiones HTTP adicionales</li>
+                    <li><strong>Específicos de página:</strong> Útiles para estilos únicos de una página</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Método 3: Archivos Externos -->
+        <section class="section">
+            <h2>Método 3: Archivos Externos (Recomendado)</h2>
+            <p>Los archivos externos se vinculan usando la etiqueta <code>&lt;link&gt;</code> en el <code>&lt;head&gt;</code>. Este es el método más recomendado para proyectos reales.</p>
+            
+            <div class="code-block">
+<code><span class="comment">&lt;!-- Enlazando archivo externo --&gt;</span>
+<span class="tag">&lt;link</span> <span class="attribute">rel</span>=<span class="value">"stylesheet"</span> <span class="attribute">href</span>=<span class="value">"styles/mi-archivo.css"</span><span class="tag">&gt;</span></code>
+            </div>
+            
+            <div class="demo-element external-demo">
+                <h4>Ejemplo de Estilos Externos</h4>
+                <p>Este elemento usa estilos definidos en un archivo externo CSS</p>
+                <p>Los estilos externos permiten reutilización entre páginas</p>
+                <button class="demo-button">Botón con estilos externos</button>
+            </div>
+            
+            <div class="info-box">
+                <h4>Ventajas de los archivos externos</h4>
+                <ul>
+                    <li><strong>Reutilización:</strong> Un archivo puede usarse en múltiples páginas</li>
+                    <li><strong>Mantenimiento:</strong> Cambios en un solo lugar afectan toda la aplicación</li>
+                    <li><strong>Rendimiento:</strong> Los navegadores pueden cachear los archivos</li>
+                    <li><strong>Organización:</strong> Separación clara entre estructura y presentación</li>
+                    <li><strong>Equipo:</strong> Múltiples desarrolladores pueden trabajar en paralelo</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Método 4: @import en CSS -->
+        <section class="section">
+            <h2>Método 4: @import en CSS</h2>
+            <p>La regla <code>@import</code> permite cargar un archivo CSS desde otro archivo CSS. Es útil para organizar estilos en módulos.</p>
+            
+            <div class="code-block">
+<code><span class="comment">/* En un archivo CSS */</span>
+<span class="tag">@import</span> <span class="value">url('otro-archivo.css')</span>;
+
+<span class="comment">/* O con sintaxis moderna */</span>
+<span class="tag">@import</span> <span class="value">'otro-archivo.css'</span>;</code>
+            </div>
+            
+            <div class="demo-element" style="background: linear-gradient(45deg, #ff6b6b, #4ecdc4); color: white; padding: 20px; border-radius: 12px; margin: 20px 0;">
+                <h4>Ejemplo de @import</h4>
+                <p style="font-family: 'Poppins', sans-serif; font-weight: 300; margin: 15px 0;">Este texto usa una fuente cargada via @import</p>
+                <div class="import-color-variants primary">Variante primaria (azul)</div>
+                <div class="import-color-variants success">Variante de éxito (verde)</div>
+                <div class="import-color-variants warning">Variante de advertencia (amarillo)</div>
+                <button class="demo-button" style="background: rgba(255,255,255,0.15); margin: 5px;">Botón con @import</button>
+            </div>
+            
+            <div class="warning-box">
+                <h4>⚠️ Consideraciones sobre @import</h4>
+                <ul>
+                    <li><strong>Rendimiento:</strong> Los navegadores cargan los archivos secuencialmente</li>
+                    <li><strong>Preferir &lt;link&gt;:</strong> Es más eficiente para archivos principales</li>
+                    <li><strong>Modularización:</strong> Útil para componentes y librerías CSS</li>
+                    <li><strong>Organización:</strong> Permite dividir estilos en archivos lógicos</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Método 5: preload y preconnect -->
+        <section class="section">
+            <h2>Método 5: Optimización con preload y preconnect</h2>
+            <p>Estas etiquetas especiales mejoran el rendimiento al cargar recursos críticos de forma anticipada.</p>
+            
+            <div class="code-block">
+<code><span class="comment">&lt;!-- Precargar fuente crítica --&gt;</span>
+<span class="tag">&lt;link</span> <span class="attribute">rel</span>=<span class="value">"preload"</span> <span class="attribute">href</span>=<span class="value">"fonts/main-font.woff2"</span> <span class="attribute">as</span>=<span class="value">"font"</span> <span class="attribute">type</span>=<span class="value">"font/woff2"</span> <span class="attribute">crossorigin</span><span class="tag">&gt;</span>
+
+<span class="comment">&lt;!-- Precargar CSS crítico --&gt;</span>
+<span class="tag">&lt;link</span> <span class="attribute">rel</span>=<span class="value">"preload"</span> <span class="attribute">href</span>=<span class="value">"styles/critical.css"</span> <span class="attribute">as</span>=<span class="value">"style"</span><span class="tag">&gt;</span>
+
+<span class="comment">&lt;!-- Conectar anticipadamente al CDN --&gt;</span>
+<span class="tag">&lt;link</span> <span class="attribute">rel</span>=<span class="value">"preconnect"</span> <span class="attribute">href</span>=<span class="value">"https://fonts.googleapis.com"</span><span class="tag">&gt;</span></code>
+            </div>
+            
+            <div class="info-box">
+                <h4>Optimizaciones de rendimiento</h4>
+                <ul>
+                    <li><strong>preload:</strong> Carga recursos críticos antes de que sean necesarios</li>
+                    <li><strong>preconnect:</strong> Establece conexión anticipada con servidores</li>
+                    <li><strong>as:</strong> Especifica el tipo de recurso para mejor rendimiento</li>
+                    <li><strong>crossorigin:</strong> Necesario para recursos de otros dominios</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Comparación de Especificidad -->
+        <section class="section">
+            <h2>Comparación de Especificidad</h2>
+            <p>La especificidad determina qué estilos se aplican cuando hay conflictos. En orden de menor a mayor especificidad:</p>
+            
+            <div class="specificity-demo">
+                <div class="specificity-item external">
+                    <h4>1. Estilos de agente de usuario (navegador)</h4>
+                    <p>Estilos por defecto del navegador. Especificidad: 0,0,0,0</p>
+                </div>
+                
+                <div class="specificity-item external">
+                    <h4>2. Estilos externos (archivos .css)</h4>
+                    <p>Estilos vinculados con &lt;link&gt;. Especificidad: 0,0,1,0 (por selector)</p>
+                </div>
+                
+                <div class="specificity-item internal">
+                    <h4>3. Estilos internos (&lt;style&gt;)</h4>
+                    <p>Estilos en el head. Misma especificidad que externos, pero cargan después</p>
+                </div>
+                
+                <div class="specificity-item inline">
+                    <h4>4. Estilos inline (atributo style)</h4>
+                    <p>Estilos con atributo style. Especificidad: 1,0,0,0 (máxima)</p>
+                </div>
+                
+                <div class="specificity-item inline">
+                    <h4>5. !important (cualquier método)</h4>
+                    <p>Override cualquier especificidad. Usar con cuidado</p>
+                </div>
+            </div>
+            
+            <div class="demo-element" style="text-align: center;">
+                <h4>Demostración de Especificidad</h4>
+                <p style="color: green;">Este párrafo debería aparecer en verde si el estilo externo tiene mayor especificidad</p>
+                <p style="color: red; font-size: 20px;">Este párrafo aparece en rojo por estilo inline (mayor especificidad)</p>
+            </div>
+        </section>
+
+        <!-- Mejores Prácticas -->
+        <section class="section">
+            <h2>Mejores Prácticas</h2>
+            
+            <h3>¿Cuándo usar cada método?</h3>
+            <ul>
+                <li><strong>Archivos externos:</strong> Producción, aplicaciones grandes, equipos de desarrollo</li>
+                <li><strong>Estilos internos:</strong> Páginas únicas, prototipado rápido, estilos específicos de página</li>
+                <li><strong>Estilos inline:</strong> Estilos únicos, debugging, aplicaciones SPA</li>
+                <li><strong>@import:</strong> Modularización, componentes, librerías CSS</li>
+                <li><strong>preload:</strong> Recursos críticos, optimización de rendimiento</li>
+            </ul>
+            
+            <div class="warning-box">
+                <h4>❌ Evitar</h4>
+                <ul>
+                    <li>Exceso de estilos inline (difícil de mantener)</li>
+                    <li>Múltiples archivos CSS pequeños (múltiples peticiones HTTP)</li>
+                    <li>@import en archivos críticos de producción</li>
+                    <li>!important sin necesidad (rompe la cascada natural)</li>
+                </ul>
+            </div>
+            
+            <div class="info-box">
+                <h4>✅ Recomendado</h4>
+                <ul>
+                    <li>Usar archivos externos para estilos compartidos</li>
+                    <li>Minificar CSS en producción</li>
+                    <li>Usar sistemas de build (Webpack, Vite, etc.)</li>
+                    <li>Organizar CSS por componentes o funcionalidades</li>
+                    <li>Usar preprocesadores (SASS, LESS) cuando sea apropiado</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Resumen -->
+        <section class="section">
+            <h2>Resumen</h2>
+            <p>Hemos explorado las cinco formas principales de cargar CSS en una página web:</p>
+            
+            <ol>
+                <li><strong>Estilos Inline:</strong> Máxima especificidad, difícil mantenimiento</li>
+                <li><strong>Estilos Internos:</strong> Equilibrio entre especificidad y organización</li>
+                <li><strong>Archivos Externos:</strong> Método recomendado para producción</li>
+                <li><strong>@import:</strong> Modularización y organización de código</li>
+                <li><strong>preload/preconnect:</strong> Optimización de rendimiento</li>
+            </ol>
+            
+            <p>La elección del método depende del contexto, tamaño del proyecto, necesidades de mantenimiento y requisitos de rendimiento.</p>
+            
+            <div style="text-align: center; margin: 3rem 0; padding: 2rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px;">
+                <h3>¡Felicitaciones! 🎉</h3>
+                <p>Has completado la guía sobre formas de cargar CSS. Ahora tienes el conocimiento para optimizar tus hojas de estilo y tomar decisiones informadas sobre la arquitectura CSS de tus proyectos.</p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Script para interactividad en la demostración
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ejemplo de manipulación de estilos inline con JavaScript
+            const inlineButtons = document.querySelectorAll('.inline-example .demo-button');
+            inlineButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    alert('Has hecho clic en un botón con estilo inline!');
+                    this.style.background = 'rgba(255,255,255,0.4)';
+                });
+            });
+            
+            // Ejemplo de manipulación de estilos externos
+            const externalButtons = document.querySelectorAll('.external-demo .demo-button');
+            externalButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    this.style.transform = 'scale(1.1)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 200);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

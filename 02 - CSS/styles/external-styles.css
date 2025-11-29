@@ -1,0 +1,96 @@
+/* ========================================
+   ESTILOS EXTERNOS - Método de carga externa
+   ======================================== */
+
+/* Estilos para la sección de demostración externa */
+.external-demo {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.external-demo:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+}
+
+.external-demo h4 {
+    margin-top: 0;
+    color: #fff;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+}
+
+.external-demo p {
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+.external-demo .demo-button {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    margin-top: 15px;
+}
+
+.external-demo .demo-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-1px);
+}
+
+/* Estilos para demostrar especificidad con archivos externos */
+.external-specificity {
+    background-color: #e8f5e8;
+    border: 3px solid #4CAF50;
+    color: #2e7d32;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+    font-weight: 500;
+}
+
+.external-specificity.important {
+    background-color: #fff3cd;
+    border-color: #ffc107;
+    color: #856404;
+    font-weight: 700;
+}
+
+/* Estilos adicionales para el layout general */
+.external-examples {
+    display: grid;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+@media (min-width: 768px) {
+    .external-examples {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* Animaciones para elementos externos */
+@keyframes externalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.external-demo {
+    animation: externalFadeIn 0.6s ease-out;
+}
