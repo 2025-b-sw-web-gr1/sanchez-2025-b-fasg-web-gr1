@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airbnb - Alojamientos vacacionales únicos</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg" />
+    
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <!-- Logo -->
+            <div class="nav-logo">
+                <img src="assets/icons/airbnb-logo.svg" alt="Airbnb" class="logo-img">
+            </div>
+            
+            <!-- Search Bar (Desktop) -->
+            <div class="search-container-desktop">
+                <div class="search-form-desktop">
+                    <button class="search-field">
+                        <span class="search-label">Dónde</span>
+                        <span class="search-placeholder">Explora destinos</span>
+                    </button>
+                    <div class="search-divider"></div>
+                    <button class="search-field">
+                        <span class="search-label">Llegada</span>
+                        <span class="search-placeholder">Añade fechas</span>
+                    </button>
+                    <div class="search-divider"></div>
+                    <button class="search-field">
+                        <span class="search-label">Salida</span>
+                        <span class="search-placeholder">Añade fechas</span>
+                    </button>
+                    <div class="search-divider"></div>
+                    <button class="search-field">
+                        <span class="search-label">Huéspedes</span>
+                        <span class="search-placeholder">¿Cuántos?</span>
+                    </button>
+                    <button class="search-submit">
+                        <img src="assets/icons/search-icon.svg" alt="Buscar">
+                    </button>
+                </div>
+            </div>
+            
+            <!-- User Actions -->
+            <div class="nav-actions">
+                <a href="#" class="host-link">Pon tu casa en Airbnb</a>
+                <button class="user-menu">
+                    <div class="menu-icon">
+                        <div class="menu-line"></div>
+                        <div class="menu-line"></div>
+                        <div class="menu-line"></div>
+                    </div>
+                    <div class="user-avatar">
+                        <img src="assets/icons/user-icon.svg" alt="Usuario">
+                    </div>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero-section" id="hero-section">
+            <div class="hero-container">
+                <h1 class="hero-title">Descubre tu próximo refugio</h1>
+                <div class="search-container-mobile">
+                    <div class="search-form-mobile">
+                        <button class="search-input" id="open-search">
+                            <img src="assets/icons/search-icon.svg" alt="Buscar" class="search-icon">
+                            <span class="search-text">¿Adónde quieres ir?</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Properties Section -->
+        <section class="properties-section">
+            <div class="container">
+                <!-- Section Header -->
+                <div class="section-header">
+                    <h2 class="section-title">Destinos populares</h2>
+                    <div class="filter-tabs">
+                        <button class="filter-tab active" data-filter="all">Todos</button>
+                        <button class="filter-tab" data-filter="casa">Casas</button>
+                        <button class="filter-tab" data-filter="apartamento">Apartamentos</button>
+                        <button class="filter-tab" data-filter="villa">Villas</button>
+                        <button class="filter-tab" data-filter="cabaña">Cabañas</button>
+                    </div>
+                </div>
+
+                <!-- Properties Grid -->
+                <div class="properties-grid" id="properties-grid">
+                    <!-- Properties will be loaded here -->
+                </div>
+
+                <!-- No Results Message -->
+                <div class="no-results" id="no-results" style="display: none;">
+                    <div class="no-results-content">
+                        <h3>No se encontraron propiedades</h3>
+                        <p>Intenta con diferentes criterios de búsqueda</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Asistencia</h4>
+                    <ul>
+                        <li><a href="#">Centro de ayuda</a></li>
+                        <li><a href="#">AirCover</a></li>
+                        <li><a href="#">Antidiscriminación</a></li>
+                        <li><a href="#">Problemas de vecindad</a></li>
+                        <li><a href="#">Confianza y seguridad</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Comunidad</h4>
+                    <ul>
+                        <li><a href="#">Airbnb.org: ayuda en casos de灾害</a></li>
+                        <li><a href="#">Lucha contra la discriminación</a></li>
+                        <li><a href="#">Asociaciones comunitarias</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Anfitrión</h4>
+                    <ul>
+                        <li><a href="#">Pon tu casa en Airbnb</a></li>
+                        <li><a href="#">AirCover para anfitriones</a></li>
+                        <li><a href="#">Recursos para anfitriones</a></li>
+                        <li><a href="#">Foro de la comunidad</a></li>
+                        <li><a href="#">Anfitrión responsable</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Airbnb</h4>
+                    <ul>
+                        <li><a href="#">Sala de prensa</a></li>
+                        <li><a href="#">Nuevas funciones</a></li>
+                        <li><a href="#">Inversionistas</a></li>
+                        <li><a href="#">Airbnb.org</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <div class="footer-legal">
+                    <p>&copy; 2025 Airbnb Clone. Desarrollado por MiniMax Agent.</p>
+                    <div class="footer-links">
+                        <a href="#">Privacidad</a>
+                        <a href="#">Términos</a>
+                        <a href="#">Mapa del sitio</a>
+                        <a href="#">Opciones de accesibilidad</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Search Modal (Mobile) -->
+    <div class="search-modal" id="search-modal">
+        <div class="search-modal-content">
+            <div class="search-modal-header">
+                <button class="close-modal" id="close-search-modal">×</button>
+                <h3>Busca tu próximo destino</h3>
+            </div>
+            <div class="search-modal-form">
+                <div class="search-field-modal">
+                    <label>Dónde</label>
+                    <input type="text" placeholder="Explora destinos" id="destination-input">
+                </div>
+                <div class="search-field-row">
+                    <div class="search-field-modal">
+                        <label>Llegada</label>
+                        <input type="date" id="checkin-input">
+                    </div>
+                    <div class="search-field-modal">
+                        <label>Salida</label>
+                        <input type="date" id="checkout-input">
+                    </div>
+                </div>
+                <div class="search-field-modal">
+                    <label>Huéspedes</label>
+                    <input type="number" min="1" max="16" value="2" id="guests-input">
+                </div>
+                <button class="modal-search-btn" id="modal-search-btn">
+                    <img src="assets/icons/search-icon.svg" alt="Buscar">
+                    Buscar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="scripts/main.js"></script>
+</body>
+</html>
