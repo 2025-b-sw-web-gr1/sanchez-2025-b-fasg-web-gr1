@@ -1,0 +1,23 @@
+{
+  "name": "tennis-for-two",
+  "version": "1.0.0",
+  "description": "A WebGL recreation of the classic Tennis for Two game",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^7.2.6"
+  },
+  "keywords": [
+    "tennis",
+    "webgl",
+    "game",
+    "vintage",
+    "retro"
+  ],
+  "author": "AI Assistant",
+  "license": "MIT"
+}

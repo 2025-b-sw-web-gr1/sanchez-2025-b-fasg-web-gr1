@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tennis for Two - Standalone</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+        }
+        
+        #gameCanvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+            cursor: none;
+        }
+        
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #0f0;
+            font-size: 24px;
+            text-align: center;
+            text-shadow: 0 0 10px #0f0;
+            z-index: 10;
+        }
+        
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #0f0;
+            font-size: 14px;
+            text-align: center;
+            opacity: 0.7;
+            z-index: 10;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    
+    <div id="ui">
+        <div id="score">Player 1: 0 | Player 2: 0</div>
+        <div id="winner" class="hidden"></div>
+    </div>
+    
+    <div id="controls">
+        Player 1: W/S keys | Player 2: ↑/↓ arrows | Space: Pause/Restart
+    </div>
+    
+    <script>
+        // WebGL Renderer
+        class WebGLRenderer {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                
+                if (!this.gl) {
+                    throw new Error('WebGL not supported');
+                }
+                
+                this.setupCanvas();
+                this.createShaders();
+                this.setupBuffers();
+                this.setupUniforms();
+            }
+            
+            setupCanvas() {
+                const resizeCanvas = () => {
+                    const displayWidth = this.canvas.clientWidth;
+                    const displayHeight = this.canvas.clientHeight;
+                    
+                    if (this.canvas.width !== displayWidth || this.canvas.height !== displayHeight) {
+                        this.canvas.width = displayWidth;
+                        this.canvas.height = displayHeight;
+                        this.gl.viewport(0, 0, displayWidth, displayHeight);
+                    }
+                };
+                
+                resizeCanvas();
+                window.addEventListener('resize', resizeCanvas);
+            }
+            
+            createShaders() {
+                const vertexShaderSource = `
+                    attribute vec2 a_position;
+                    uniform vec2 u_resolution;
+                    uniform vec2 u_translation;
+                    uniform vec2 u_scale;
+                    
+                    void main() {
+                        vec2 position = (a_position * u_scale + u_translation) / u_resolution * 2.0 - 1.0;
+                        gl_Position = vec4(position * vec2(1, -1), 0, 1);
+                    }
+                `;
+                
+                const fragmentShaderSource = `
+                    precision mediump float;
+                    uniform vec4 u_color;
+                    
+                    void main() {
+                        gl_FragColor = u_color;
+                    }
+                `;
+                
+                this.program = this.createProgram(vertexShaderSource, fragmentShaderSource);
+                this.gl.useProgram(this.program);
+            }
+            
+            createProgram(vertexSource, fragmentSource) {
+                const vertexShader = this.createShader(this.gl.VERTEX_SHADER, vertexSource);
+                const fragmentShader = this.createShader(this.gl.FRAGMENT_SHADER, fragmentSource);
+                
+                const program = this.gl.createProgram();
+                this.gl.attachShader(program, vertexShader);
+                this.gl.attachShader(program, fragmentShader);
+                this.gl.linkProgram(program);
+                
+                if (!this.gl.getProgramParameter(program, this.gl.LINK_STATUS)) {
+                    throw new Error('Program linking failed: ' + this.gl.getProgramInfoLog(program));
+                }
+                
+                return program;
+            }
+            
+            createShader(type, source) {
+                const shader = this.gl.createShader(type);
+                this.gl.shaderSource(shader, source);
+                this.gl.compileShader(shader);
+                
+                if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
+                    throw new Error('Shader compilation failed: ' + this.gl.getShaderInfoLog(shader));
+                }
+                
+                return shader;
+            }
+            
+            setupBuffers() {
+                this.rectangleBuffer = this.gl.createBuffer();
+                this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.rectangleBuffer);
+                
+                const vertices = new Float32Array([
+                    -0.5, -0.5,
+                     0.5, -0.5,
+                    -0.5,  0.5,
+                     0.5,  0.5,
+                ]);
+                
+                this.gl.bufferData(this.gl.ARRAY_BUFFER, vertices, this.gl.STATIC_DRAW);
+                
+                this.positionAttribute = this.gl.getAttribLocation(this.program, 'a_position');
+                this.gl.enableVertexAttribArray(this.positionAttribute);
+                this.gl.vertexAttribPointer(this.positionAttribute, 2, this.gl.FLOAT, false, 0, 0);
+            }
+            
+            setupUniforms() {
+                this.resolutionUniform = this.gl.getUniformLocation(this.program, 'u_resolution');
+                this.translationUniform = this.gl.getUniformLocation(this.program, 'u_translation');
+                this.scaleUniform = this.gl.getUniformLocation(this.program, 'u_scale');
+                this.colorUniform = this.gl.getUniformLocation(this.program, 'u_color');
+            }
+            
+            clear(r = 0, g = 0, b = 0, a = 1) {
+                this.gl.clearColor(r, g, b, a);
+                this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+            }
+            
+            drawRect(x, y, width, height, color = [1, 1, 1, 1]) {
+                const resolution = [this.canvas.width, this.canvas.height];
+                const translation = [x + width / 2, y + height / 2];
+                const scale = [width, height];
+                
+                this.gl.uniform2fv(this.resolutionUniform, resolution);
+                this.gl.uniform2fv(this.translationUniform, translation);
+                this.gl.uniform2fv(this.scaleUniform, scale);
+                this.gl.uniform4fv(this.colorUniform, color);
+                
+                this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, 4);
+            }
+            
+            getCanvasSize() {
+                return {
+                    width: this.canvas.width,
+                    height: this.canvas.height
+                };
+            }
+        }
+
+        // Game Objects
+        class Ball {
+            constructor(x, y, size = 10) {
+                this.x = x;
+                this.y = y;
+                this.size = size;
+                this.vx = 0;
+                this.vy = 0;
+                this.speed = 5;
+                this.maxSpeed = 15;
+                this.acceleration = 1.1;
+            }
+            
+            reset(x, y) {
+                this.x = x;
+                this.y = y;
+                this.vx = 0;
+                this.vy = 0;
+            }
+            
+            launch(direction) {
+                this.vx = this.speed * direction;
+                this.vy = (Math.random() - 0.5) * this.speed * 0.5;
+            }
+            
+            update(canvasHeight) {
+                this.x += this.vx;
+                this.y += this.vy;
+                
+                if (this.y - this.size / 2 <= 0 || this.y + this.size / 2 >= canvasHeight) {
+                    this.vy = -this.vy;
+                    this.y = Math.max(this.size / 2, Math.min(canvasHeight - this.size / 2, this.y));
+                    return 'wall';
+                }
+                
+                return null;
+            }
+            
+            accelerate() {
+                const currentSpeed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+                const newSpeed = Math.min(currentSpeed * this.acceleration, this.maxSpeed);
+                const ratio = newSpeed / currentSpeed;
+                
+                this.vx *= ratio;
+                this.vy *= ratio;
+            }
+            
+            render(renderer, color = [1, 1, 1, 1]) {
+                renderer.drawRect(
+                    this.x - this.size / 2,
+                    this.y - this.size / 2,
+                    this.size,
+                    this.size,
+                    color
+                );
+            }
+            
+            getBounds() {
+                return {
+                    left: this.x - this.size / 2,
+                    right: this.x + this.size / 2,
+                    top: this.y - this.size / 2,
+                    bottom: this.y + this.size / 2
+                };
+            }
+        }
+
+        class Paddle {
+            constructor(x, y, width = 15, height = 80) {
+                this.x = x;
+                this.y = y;
+                this.width = width;
+                this.height = height;
+                this.speed = 8;
+                this.targetY = y;
+            }
+            
+            moveUp() {
+                this.targetY -= this.speed;
+            }
+            
+            moveDown() {
+                this.targetY += this.speed;
+            }
+            
+            update(canvasHeight) {
+                const diff = this.targetY - this.y;
+                this.y += diff * 0.3;
+                this.y = Math.max(this.height / 2, Math.min(canvasHeight - this.height / 2, this.y));
+            }
+            
+            render(renderer, color = [1, 1, 1, 1]) {
+                renderer.drawRect(
+                    this.x - this.width / 2,
+                    this.y - this.height / 2,
+                    this.width,
+                    this.height,
+                    color
+                );
+            }
+            
+            getBounds() {
+                return {
+                    left: this.x - this.width / 2,
+                    right: this.x + this.width / 2,
+                    top: this.y - this.height / 2,
+                    bottom: this.y + this.height / 2
+                };
+            }
+        }
+
+        class Court {
+            constructor(width, height) {
+                this.width = width;
+                this.height = height;
+                this.netWidth = 4;
+                this.dashLength = 20;
+                this.dashGap = 10;
+            }
+            
+            render(renderer) {
+                const netX = this.width / 2 - this.netWidth / 2;
+                
+                let y = 0;
+                while (y < this.height) {
+                    renderer.drawRect(
+                        netX,
+                        y,
+                        this.netWidth,
+                        Math.min(this.dashLength, this.height - y),
+                        [1, 1, 1, 1]
+                    );
+                    y += this.dashLength + this.dashGap;
+                }
+                
+                const lineWidth = 2;
+                renderer.drawRect(0, 0, this.width, lineWidth, [1, 1, 1, 1]);
+                renderer.drawRect(0, this.height - lineWidth, this.width, lineWidth, [1, 1, 1, 1]);
+            }
+        }
+
+        // Audio System
+        class AudioSystem {
+            constructor() {
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                this.masterGain = this.audioContext.createGain();
+                this.masterGain.connect(this.audioContext.destination);
+                this.masterGain.gain.value = 0.3;
+            }
+            
+            playPaddleHit(impactPosition = 0) {
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(this.masterGain);
+                
+                const baseFreq = 200;
+                const freqVariation = impactPosition * 100;
+                oscillator.frequency.setValueAtTime(baseFreq + freqVariation, this.audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(baseFreq * 0.5, this.audioContext.currentTime + 0.1);
+                
+                oscillator.type = 'square';
+                
+                gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.5, this.audioContext.currentTime + 0.01);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.1);
+                
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + 0.1);
+            }
+            
+            playWallHit() {
+                const bufferSize = this.audioContext.sampleRate * 0.1;
+                const buffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
+                const output = buffer.getChannelData(0);
+                
+                for (let i = 0; i < bufferSize; i++) {
+                    output[i] = Math.random() * 2 - 1;
+                }
+                
+                const source = this.audioContext.createBufferSource();
+                const gainNode = this.audioContext.createGain();
+                const filter = this.audioContext.createBiquadFilter();
+                
+                source.buffer = buffer;
+                source.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(this.masterGain);
+                
+                filter.type = 'highpass';
+                filter.frequency.value = 1000;
+                
+                gainNode.gain.setValueAtTime(0.3, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.1);
+                
+                source.start(this.audioContext.currentTime);
+                source.stop(this.audioContext.currentTime + 0.1);
+            }
+            
+            playScore() {
+                const notes = [220, 440];
+                const duration = 0.15;
+                
+                notes.forEach((freq, index) => {
+                    const oscillator = this.audioContext.createOscillator();
+                    const gainNode = this.audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(this.masterGain);
+                    
+                    oscillator.type = 'square';
+                    oscillator.frequency.setValueAtTime(freq, this.audioContext.currentTime + index * duration);
+                    
+                    const startTime = this.audioContext.currentTime + index * duration;
+                    gainNode.gain.setValueAtTime(0, startTime);
+                    gainNode.gain.linearRampToValueAtTime(0.4, startTime + 0.02);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration - 0.02);
+                    
+                    oscillator.start(startTime);
+                    oscillator.stop(startTime + duration);
+                });
+            }
+            
+            playWin() {
+                const chord = [523.25, 659.25, 783.99, 1046.50];
+                const duration = 0.3;
+                
+                chord.forEach((freq, index) => {
+                    const oscillator = this.audioContext.createOscillator();
+                    const gainNode = this.audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(this.masterGain);
+                    
+                    oscillator.type = 'square';
+                    oscillator.frequency.setValueAtTime(freq, this.audioContext.currentTime + index * 0.1);
+                    
+                    const startTime = this.audioContext.currentTime + index * 0.1;
+                    gainNode.gain.setValueAtTime(0, startTime);
+                    gainNode.gain.linearRampToValueAtTime(0.5, startTime + 0.05);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+                    
+                    oscillator.start(startTime);
+                    oscillator.stop(startTime + duration);
+                });
+            }
+            
+            resume() {
+                if (this.audioContext.state === 'suspended') {
+                    this.audioContext.resume();
+                }
+            }
+        }
+
+        // Game Logic
+        class GameLogic {
+            constructor(canvasWidth, canvasHeight) {
+                this.canvasWidth = canvasWidth;
+                this.canvasHeight = canvasHeight;
+                this.reset();
+            }
+            
+            reset() {
+                this.ball = new Ball(this.canvasWidth / 2, this.canvasHeight / 2);
+                this.leftPaddle = new Paddle(50, this.canvasHeight / 2);
+                this.rightPaddle = new Paddle(this.canvasWidth - 50, this.canvasHeight / 2);
+                this.court = new Court(this.canvasWidth, this.canvasHeight);
+                
+                this.scores = { left: 0, right: 0 };
+                this.gameState = 'waiting';
+                this.winner = null;
+                this.winningScore = 5;
+                
+                setTimeout(() => {
+                    if (this.gameState === 'waiting') {
+                        this.ball.launch(Math.random() > 0.5 ? 1 : -1);
+                        this.gameState = 'playing';
+                    }
+                }, 1000);
+            }
+            
+            update(keys) {
+                if (this.gameState === 'paused' || this.gameState === 'gameOver') {
+                    return;
+                }
+                
+                this.updatePaddles(keys);
+                this.leftPaddle.update(this.canvasHeight);
+                this.rightPaddle.update(this.canvasHeight);
+                
+                const wallHit = this.ball.update(this.canvasHeight);
+                if (wallHit === 'wall') {
+                    return 'wall';
+                }
+                
+                const paddleHit = this.checkPaddleCollisions();
+                if (paddleHit) {
+                    return paddleHit;
+                }
+                
+                const score = this.checkScoring();
+                if (score) {
+                    return score;
+                }
+                
+                return null;
+            }
+            
+            updatePaddles(keys) {
+                if (keys['KeyW'] || keys['w']) {
+                    this.leftPaddle.moveUp();
+                }
+                if (keys['KeyS'] || keys['s']) {
+                    this.leftPaddle.moveDown();
+                }
+                if (keys['ArrowUp']) {
+                    this.rightPaddle.moveUp();
+                }
+                if (keys['ArrowDown']) {
+                    this.rightPaddle.moveDown();
+                }
+            }
+            
+            checkPaddleCollisions() {
+                const ballBounds = this.ball.getBounds();
+                const leftPaddleBounds = this.leftPaddle.getBounds();
+                
+                if (this.isColliding(ballBounds, leftPaddleBounds) && this.ball.vx < 0) {
+                    this.handlePaddleCollision(this.leftPaddle, -1);
+                    return 'paddle';
+                }
+                
+                const rightPaddleBounds = this.rightPaddle.getBounds();
+                if (this.isColliding(ballBounds, rightPaddleBounds) && this.ball.vx > 0) {
+                    this.handlePaddleCollision(this.rightPaddle, 1);
+                    return 'paddle';
+                }
+                
+                return null;
+            }
+            
+            isColliding(rect1, rect2) {
+                return rect1.left < rect2.right &&
+                       rect1.right > rect2.left &&
+                       rect1.top < rect2.bottom &&
+                       rect1.bottom > rect2.top;
+            }
+            
+            handlePaddleCollision(paddle, direction) {
+                this.ball.vx = -this.ball.vx;
+                
+                const ballCenterY = this.ball.y;
+                const paddleCenterY = paddle.y;
+                const impactPosition = (ballCenterY - paddleCenterY) / (paddle.height / 2);
+                
+                this.ball.vy = impactPosition * this.ball.speed * 0.8;
+                this.ball.accelerate();
+                
+                this.ball.x = paddle.x + (paddle.width / 2 + this.ball.size / 2 + 1) * direction;
+            }
+            
+            checkScoring() {
+                const ballBounds = this.ball.getBounds();
+                
+                if (ballBounds.right < 0) {
+                    this.scores.right++;
+                    this.resetBall();
+                    if (this.scores.right >= this.winningScore) {
+                        this.winner = 'right';
+                        this.gameState = 'gameOver';
+                        return 'win';
+                    }
+                    return 'score';
+                }
+                
+                if (ballBounds.left > this.canvasWidth) {
+                    this.scores.left++;
+                    this.resetBall();
+                    if (this.scores.left >= this.winningScore) {
+                        this.winner = 'left';
+                        this.gameState = 'gameOver';
+                        return 'win';
+                    }
+                    return 'score';
+                }
+                
+                return null;
+            }
+            
+            resetBall() {
+                this.ball.reset(this.canvasWidth / 2, this.canvasHeight / 2);
+                
+                setTimeout(() => {
+                    if (this.gameState === 'playing') {
+                        this.ball.launch(Math.random() > 0.5 ? 1 : -1);
+                    }
+                }, 1000);
+            }
+            
+            togglePause() {
+                if (this.gameState === 'playing') {
+                    this.gameState = 'paused';
+                } else if (this.gameState === 'paused') {
+                    this.gameState = 'playing';
+                }
+            }
+            
+            getGameState() {
+                return {
+                    ball: this.ball,
+                    leftPaddle: this.leftPaddle,
+                    rightPaddle: this.rightPaddle,
+                    court: this.court,
+                    scores: this.scores,
+                    gameState: this.gameState,
+                    winner: this.winner
+                };
+            }
+            
+            render(renderer) {
+                this.court.render(renderer);
+                this.leftPaddle.render(renderer, [0, 1, 0, 1]);
+                this.rightPaddle.render(renderer, [0, 1, 0, 1]);
+                this.ball.render(renderer, [1, 1, 1, 1]);
+            }
+        }
+
+        // Input Handler
+        class InputHandler {
+            constructor() {
+                this.keys = {};
+                this.setupEventListeners();
+            }
+            
+            setupEventListeners() {
+                window.addEventListener('keydown', (e) => {
+                    this.keys[e.code] = true;
+                    this.keys[e.key] = true;
+                    
+                    if (['ArrowUp', 'ArrowDown', 'KeyW', 'KeyS', 'Space'].includes(e.code)) {
+                        e.preventDefault();
+                    }
+                });
+                
+                window.addEventListener('keyup', (e) => {
+                    this.keys[e.code] = false;
+                    this.keys[e.key] = false;
+                });
+                
+                document.addEventListener('visibilitychange', () => {
+                    if (document.hidden) {
+                        this.keys = {};
+                    }
+                });
+            }
+            
+            getKeys() {
+                return this.keys;
+            }
+        }
+
+        // Main Game
+        class TennisForTwo {
+            constructor() {
+                this.canvas = document.getElementById('gameCanvas');
+                this.ui = {
+                    score: document.getElementById('score'),
+                    winner: document.getElementById('winner')
+                };
+                
+                this.renderer = new WebGLRenderer(this.canvas);
+                this.inputHandler = new InputHandler();
+                this.audioSystem = new AudioSystem();
+                
+                const canvasSize = this.renderer.getCanvasSize();
+                this.gameLogic = new GameLogic(canvasSize.width, canvasSize.height);
+                
+                this.gameState = this.gameLogic.getGameState();
+                this.keys = {};
+                this.lastTime = 0;
+                
+                this.setupEventListeners();
+                this.gameLoop();
+            }
+            
+            setupEventListeners() {
+                window.addEventListener('keydown', (e) => {
+                    if (e.code === 'Space') {
+                        e.preventDefault();
+                        this.handleSpaceKey();
+                    }
+                });
+                
+                document.addEventListener('click', () => {
+                    this.audioSystem.resume();
+                }, { once: true });
+                
+                window.addEventListener('resize', () => {
+                    const canvasSize = this.renderer.getCanvasSize();
+                    this.gameLogic.canvasWidth = canvasSize.width;
+                    this.gameLogic.canvasHeight = canvasSize.height;
+                });
+            }
+            
+            handleSpaceKey() {
+                const gameState = this.gameLogic.getGameState();
+                
+                if (gameState.gameState === 'gameOver') {
+                    this.gameLogic.reset();
+                    this.ui.winner.classList.add('hidden');
+                } else {
+                    this.gameLogic.togglePause();
+                }
+            }
+            
+            updateUI() {
+                const gameState = this.gameLogic.getGameState();
+                this.ui.score.textContent = `Player 1: ${gameState.scores.left} | Player 2: ${gameState.scores.right}`;
+                
+                if (gameState.gameState === 'gameOver' && gameState.winner) {
+                    const winnerText = gameState.winner === 'left' ? 'Player 1 Wins!' : 'Player 2 Wins!';
+                    this.ui.winner.textContent = winnerText;
+                    this.ui.winner.classList.remove('hidden');
+                }
+            }
+            
+            gameLoop(currentTime = 0) {
+                const deltaTime = currentTime - this.lastTime;
+                this.lastTime = currentTime;
+                
+                this.keys = this.inputHandler.getKeys();
+                
+                const event = this.gameLogic.update(this.keys);
+                
+                if (event) {
+                    this.handleGameEvent(event);
+                }
+                
+                this.renderer.clear(0, 0, 0, 1);
+                this.gameLogic.render(this.renderer);
+                
+                this.updateUI();
+                
+                requestAnimationFrame((time) => this.gameLoop(time));
+            }
+            
+            handleGameEvent(event) {
+                switch (event) {
+                    case 'paddle':
+                        const gameState = this.gameLogic.getGameState();
+                        const ballY = gameState.ball.y;
+                        const paddleY = gameState.ball.vx > 0 ? 
+                            gameState.leftPaddle.y : gameState.rightPaddle.y;
+                        const impactPosition = (ballY - paddleY) / (gameState.leftPaddle.height / 2);
+                        this.audioSystem.playPaddleHit(impactPosition);
+                        break;
+                        
+                    case 'wall':
+                        this.audioSystem.playWallHit();
+                        break;
+                        
+                    case 'score':
+                        this.audioSystem.playScore();
+                        break;
+                        
+                    case 'win':
+                        this.audioSystem.playWin();
+                        break;
+                }
+            }
+        }
+
+        // Initialize game
+        window.addEventListener('DOMContentLoaded', () => {
+            new TennisForTwo();
+        });
+    </script>
+</body>
+</html>
