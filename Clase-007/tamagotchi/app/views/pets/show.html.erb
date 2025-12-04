@@ -1,0 +1,21 @@
+<div class="container">
+  <h1
+    style="margin-bottom: 30px; font-size: 3em; text-align: center; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);"
+  >
+    🐾 Mascota Virtual
+  </h1>
+  <!-- Turbo Frame que contiene toda la interactividad -->
+  <%= turbo_frame_tag "game_board" do %>
+    <%= render "pet", pet: @pet %>
+  <% end %>
+
+  <div style="margin-top: 30px; text-align: center; opacity: 0.8;">
+    <p style="font-size: 1em;">
+      Cuida bien a tu mascota. Con el tiempo will lose hunger, energía y
+      felicidad.
+    </p>
+    <p style="font-size: 0.9em; margin-top: 10px;">
+      Haz clic en los botones para mantenerla feliz y saludable.
+    </p>
+  </div>
+</div>

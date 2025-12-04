@@ -1,0 +1,187 @@
+<div id="game_board" class="pet-container">
+  <h1 class="pet-name"><%= pet.name %></h1>
+  <!-- SVG del personaje mascota -->
+  <svg class="pet-svg state-<%= pet.mood %>" viewBox="0 0 200 200">
+    <!-- Cuerpo de la mascota (forma redondeada estilo blob) -->
+    <ellipse class="pet-body" cx="100" cy="100" rx="70" ry="70"/>
+    <!-- Ojos (cambian de posición según el estado) -->
+    <% if pet.mood == "sleepy" %>
+      <!-- Ojos cerrados para sleepy -->
+      <path
+        class="eye"
+        d="M 70 85 Q 75 85 80 85"
+        stroke="#333"
+        stroke-width="3"
+        fill="none"
+      />
+      <path
+        class="eye"
+        d="M 120 85 Q 125 85 130 85"
+        stroke="#333"
+        stroke-width="3"
+        fill="none"
+      />
+    <% elsif pet.mood == "dead" %>
+      <!-- Ojos en X para dead -->
+      <path
+        class="eye"
+        d="M 70 85 L 80 95 M 80 85 L 70 95"
+        stroke="#000"
+        stroke-width="3"
+      />
+      <path
+        class="eye"
+        d="M 120 85 L 130 95 M 130 85 L 120 95"
+        stroke="#000"
+        stroke-width="3"
+      />
+    <% else %>
+      <!-- Ojos normales -->
+      <circle class="eye" cx="75" cy="85" r="8"/>
+      <circle class="eye" cx="125" cy="85" r="8"/>
+      <!-- Puntos de luz en los ojos -->
+      <circle cx="77" cy="83" r="2" fill="white"/>
+      <circle cx="127" cy="83" r="2" fill="white"/>
+    <% end %>
+    <!-- Boca (cambia según el estado de ánimo) -->
+    <% case pet.mood %>
+    <% when "happy" %>
+      <!-- Sonrisa grande para happy -->
+      <path class="mouth" d="M 70 130 Q 100 150 130 130"/>
+    <% when "hungry" %>
+      <!-- Boca abierta para hungry -->
+      <ellipse
+        class="mouth"
+        cx="100"
+        cy="130"
+        rx="12"
+        ry="8"
+        fill="#333"
+        stroke="#333"
+        stroke-width="2"
+      />
+    <% when "sleepy" %>
+      <!-- Línea recta para sleepy -->
+      <line
+        class="mouth"
+        x1="80"
+        y1="135"
+        x2="120"
+        y2="135"
+        stroke="#333"
+        stroke-width="4"
+      />
+    <% when "bored" %>
+      <!-- Boca hacia abajo para bored -->
+      <path class="mouth" d="M 70 140 Q 100 120 130 140"/>
+    <% when "dead" %>
+      <!-- Boca hacia abajo (flip) para dead -->
+      <path
+        class="mouth"
+        d="M 70 125 Q 100 105 130 125"
+        transform="scale(1, -1) translate(0, -200)"
+      />
+    <% else %>
+      <!-- Boca neutral -->
+      <ellipse
+        class="mouth"
+        cx="100"
+        cy="135"
+        rx="8"
+        ry="5"
+        stroke="#333"
+        stroke-width="2"
+        fill="none"
+      />
+    <% end %>
+    <!-- Mejillas (solo para estados felices) -->
+    <% if pet.happiness > 70 %>
+      <circle cx="60" cy="110" r="8" fill="#FFB6C1" opacity="0.6"/>
+      <circle cx="140" cy="110" r="8" fill="#FFB6C1" opacity="0.6"/>
+    <% end %>
+  </svg>
+
+  <% if pet.status == "dead" %>
+    <div class="death-message">
+      💀 Tu mascota ha muerto 💀
+    </div>
+  <% end %>
+  <!-- Barras de estadísticas -->
+  <div class="stats-container">
+    <div class="stat-bar">
+      <div class="stat-label">Hambre (<%= pet.hunger %>%)</div>
+      <div class="progress-bar">
+        <div class="progress-fill progress-hunger" style="width: <%= pet.hunger %>%"></div>
+      </div>
+    </div>
+
+    <div class="stat-bar">
+      <div class="stat-label">Energía (<%= pet.energy %>%)</div>
+      <div class="progress-bar">
+        <div class="progress-fill progress-energy" style="width: <%= pet.energy %>%"></div>
+      </div>
+    </div>
+
+    <div class="stat-bar">
+      <div class="stat-label">Felicidad (<%= pet.happiness %>%)</div>
+      <div class="progress-bar">
+        <div
+          class="progress-fill progress-happiness"
+          style="width: <%= pet.happiness %>%"
+        ></div>
+      </div>
+    </div>
+  </div>
+  <!-- Botones de acción (solo si está vivo) -->
+  <% if pet.status != "dead" %>
+    <div class="controls">
+      <%= button_to "🍎 Alimentar",
+      pet_path(pet),
+      method: :patch,
+      params: {
+        action_type: "feed",
+      },
+      class: "action-btn feed-btn",
+      form: {
+        data: {
+          turbo_frame: "game_board",
+        },
+      } %>
+
+      <%= button_to "⚽ Jugar",
+      pet_path(pet),
+      method: :patch,
+      params: {
+        action_type: "play",
+      },
+      class: "action-btn play-btn",
+      form: {
+        data: {
+          turbo_frame: "game_board",
+        },
+      } %>
+
+      <%= button_to "💤 Dormir",
+      pet_path(pet),
+      method: :patch,
+      params: {
+        action_type: "sleep",
+      },
+      class: "action-btn sleep-btn",
+      form: {
+        data: {
+          turbo_frame: "game_board",
+        },
+      } %>
+    </div>
+  <% else %>
+    <!-- Botón para crear nueva mascota -->
+    <div class="new-pet-btn">
+      <%= button_to "Crear Nueva Mascota",
+      pets_create_path,
+      method: :post,
+      class: "action-btn reset-btn" %>
+    </div>
+  <% end %>
+</div>
+
