@@ -1,0 +1,25 @@
+meta {
+  name: create-comment
+  type: http
+  seq: 9
+}
+
+post {
+  url: https://jsonplaceholder.typicode.com/comments
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "test",
+    "email": "test@example.com",
+    "body": "Nice!",
+    "postId": 1
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
