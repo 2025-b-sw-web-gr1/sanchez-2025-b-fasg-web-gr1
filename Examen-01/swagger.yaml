@@ -1,0 +1,705 @@
+openapi: 3.0.0
+info:
+  title: JSONPlaceholder API - Taller Práctico Mejorado
+  description: |
+    Documentación completa de la API REST JSONPlaceholder para el taller con Bruno.
+    
+    Esta API proporciona endpoints simulados para posts, comentarios, álbumes, 
+    fotos, tareas y usuarios. Perfecta para aprender y practicar diferentes métodos HTTP.
+    
+    **Importante**: Aunque la API acepta operaciones de escritura (POST, PUT, PATCH, DELETE),
+    los datos no se persisten realmente en el servidor.
+    
+    **Mejoras incluidas**:
+    - Schemas modulares para requests y responses
+    - Parámetros reutilizables
+    - Estructura completa de usuarios con anidación
+    - Ejemplos prácticos alineados con el taller Bruno
+    
+  version: 2.1.0
+  contact:
+    name: Soporte JSONPlaceholder
+    url: https://jsonplaceholder.typicode.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://jsonplaceholder.typicode.com
+    description: Servidor de producción
+
+tags:
+  - name: Posts
+    description: Gestión de publicaciones y artículos
+  - name: Comments
+    description: Gestión de comentarios en publicaciones
+  - name: Albums
+    description: Gestión de álbumes fotográficos
+  - name: Photos
+    description: Gestión de fotografías
+  - name: Todos
+    description: Gestión de lista de tareas
+  - name: Users
+    description: Gestión de usuarios y perfiles
+
+paths:
+  # ========== POSTS ==========
+  /posts:
+    get:
+      tags: [Posts]
+      summary: Listar todos los posts
+      operationId: getAllPosts
+      description: Recupera la lista completa de 100 publicaciones disponibles
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+    
+    post:
+      tags: [Posts]
+      summary: Crear un post nuevo
+      operationId: createPost
+      description: Crea una nueva publicación (simulación - no persiste)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostInput'
+      responses:
+        '201':
+          description: Post creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+
+  /posts/{id}:
+    get:
+      tags: [Posts]
+      summary: Obtener post específico
+      operationId: getPostById
+      description: Recupera un post mediante su identificador único
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      responses:
+        '200':
+          description: Post encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '404':
+          description: Post no existe
+    
+    put:
+      tags: [Posts]
+      summary: Reemplazar post completo
+      operationId: updatePostFull
+      description: Actualiza todos los campos de un post existente
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Post'
+      responses:
+        '200':
+          description: Post actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+    
+    patch:
+      tags: [Posts]
+      summary: Modificar título del post
+      operationId: updatePostPartial
+      description: Actualiza únicamente el título del post
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: "updated title"
+      responses:
+        '200':
+          description: Título actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+    
+    delete:
+      tags: [Posts]
+      summary: Eliminar post
+      operationId: deletePost
+      description: Elimina un post del sistema (simulado)
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      responses:
+        '200':
+          description: Post eliminado correctamente
+
+  # ========== COMMENTS ==========
+  /comments:
+    get:
+      tags: [Comments]
+      summary: Listar comentarios
+      operationId: getAllComments
+      description: Obtiene todos los comentarios, opcionalmente filtrados por post
+      parameters:
+        - name: postId
+          in: query
+          description: Filtrar comentarios por ID de post
+          required: false
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Lista de comentarios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+    
+    post:
+      tags: [Comments]
+      summary: Agregar comentario
+      operationId: createComment
+      description: Crea un comentario nuevo en un post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentInput'
+      responses:
+        '201':
+          description: Comentario creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+
+  /comments/{id}:
+    get:
+      tags: [Comments]
+      summary: Obtener comentario por ID
+      operationId: getCommentById
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      responses:
+        '200':
+          description: Comentario encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '404':
+          description: Comentario no encontrado
+
+  # ========== ALBUMS ==========
+  /albums:
+    get:
+      tags: [Albums]
+      summary: Obtener álbumes
+      operationId: getAllAlbums
+      description: Lista todos los álbumes de fotos disponibles
+      parameters:
+        - name: userId
+          in: query
+          description: Filtrar álbumes por ID de usuario
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Colección de álbumes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Album'
+    
+    post:
+      tags: [Albums]
+      summary: Crear álbum
+      operationId: createAlbum
+      description: Registra un nuevo álbum fotográfico
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlbumInput'
+      responses:
+        '201':
+          description: Álbum creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Album'
+
+  /albums/{id}:
+    get:
+      tags: [Albums]
+      summary: Consultar álbum por ID
+      operationId: getAlbumById
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      responses:
+        '200':
+          description: Álbum encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Album'
+        '404':
+          description: Álbum no encontrado
+
+  # ========== PHOTOS ==========
+  /photos:
+    get:
+      tags: [Photos]
+      summary: Listar fotos
+      operationId: getAllPhotos
+      description: Obtiene todas las fotos, con opción de filtrar por álbum
+      parameters:
+        - name: albumId
+          in: query
+          description: Filtrar por álbum específico
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Colección de fotos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Photo'
+
+  /photos/{id}:
+    get:
+      tags: [Photos]
+      summary: Obtener foto por ID
+      operationId: getPhotoById
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      responses:
+        '200':
+          description: Foto encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Photo'
+        '404':
+          description: Foto no encontrada
+
+  # ========== TODOS ==========
+  /todos:
+    get:
+      tags: [Todos]
+      summary: Listar tareas
+      operationId: getAllTodos
+      description: Recupera todas las tareas pendientes y completadas
+      parameters:
+        - name: userId
+          in: query
+          description: Filtrar tareas por ID de usuario
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Lista de tareas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Todo'
+    
+    post:
+      tags: [Todos]
+      summary: Crear tarea
+      operationId: createTodo
+      description: Agrega una nueva tarea a la lista
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TodoInput'
+      responses:
+        '201':
+          description: Tarea creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+
+  /todos/{id}:
+    get:
+      tags: [Todos]
+      summary: Buscar tarea por ID
+      operationId: getTodoById
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      responses:
+        '200':
+          description: Tarea localizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '404':
+          description: Tarea inexistente
+
+  # ========== USERS ==========
+  /users:
+    get:
+      tags: [Users]
+      summary: Listar usuarios
+      operationId: getAllUsers
+      description: Obtiene el directorio completo de usuarios registrados
+      responses:
+        '200':
+          description: Directorio de usuarios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+
+  /users/{id}:
+    get:
+      tags: [Users]
+      summary: Obtener usuario mediante ID
+      operationId: getUserById
+      description: Consulta la información detallada de un usuario
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      responses:
+        '200':
+          description: Usuario encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Usuario no localizado
+
+# ========================================
+# COMPONENTS - Schemas y Parámetros Reutilizables
+# ========================================
+components:
+  parameters:
+    ResourceId:
+      name: id
+      in: path
+      required: true
+      description: Identificador único del recurso
+      schema:
+        type: integer
+        minimum: 1
+        example: 1
+
+  schemas:
+    # ========== POST SCHEMAS ==========
+    Post:
+      type: object
+      properties:
+        userId:
+          type: integer
+          description: ID del autor del post
+          example: 1
+        id:
+          type: integer
+          description: Identificador único del post
+          example: 1
+        title:
+          type: string
+          description: Título de la publicación
+          example: "sunt aut facere repellat provident"
+        body:
+          type: string
+          description: Contenido completo del post
+          example: "quia et suscipit\nsuscipit recusandae consequuntur..."
+
+    PostInput:
+      type: object
+      required:
+        - title
+        - body
+        - userId
+      properties:
+        title:
+          type: string
+          description: Título del nuevo post
+          example: "foo"
+        body:
+          type: string
+          description: Contenido del nuevo post
+          example: "bar"
+        userId:
+          type: integer
+          description: ID del usuario autor
+          example: 1
+
+    # ========== COMMENT SCHEMAS ==========
+    Comment:
+      type: object
+      properties:
+        postId:
+          type: integer
+          description: ID del post al que pertenece
+          example: 1
+        id:
+          type: integer
+          description: ID único del comentario
+          example: 1
+        name:
+          type: string
+          description: Nombre o título del comentario
+          example: "id labore ex et quam laborum"
+        email:
+          type: string
+          format: email
+          description: Email del autor
+          example: "Eliseo@gardner.biz"
+        body:
+          type: string
+          description: Contenido del comentario
+          example: "laudantium enim quasi est quidem magnam..."
+
+    CommentInput:
+      type: object
+      required:
+        - name
+        - email
+        - body
+        - postId
+      properties:
+        postId:
+          type: integer
+          description: ID del post donde se comenta
+          example: 1
+        name:
+          type: string
+          description: Nombre del comentario
+          example: "test"
+        email:
+          type: string
+          format: email
+          description: Email del autor
+          example: "test@example.com"
+        body:
+          type: string
+          description: Texto del comentario
+          example: "Nice!"
+
+    # ========== ALBUM SCHEMAS ==========
+    Album:
+      type: object
+      properties:
+        userId:
+          type: integer
+          description: Propietario del álbum
+          example: 1
+        id:
+          type: integer
+          description: ID único del álbum
+          example: 1
+        title:
+          type: string
+          description: Nombre del álbum
+          example: "quidem molestiae enim"
+
+    AlbumInput:
+      type: object
+      required:
+        - title
+        - userId
+      properties:
+        title:
+          type: string
+          description: Título del álbum
+          example: "Vacation"
+        userId:
+          type: integer
+          description: ID del usuario propietario
+          example: 1
+
+    # ========== PHOTO SCHEMAS ==========
+    Photo:
+      type: object
+      properties:
+        albumId:
+          type: integer
+          description: ID del álbum contenedor
+          example: 1
+        id:
+          type: integer
+          description: ID único de la foto
+          example: 1
+        title:
+          type: string
+          description: Título de la imagen
+          example: "accusamus beatae ad facilis cum similique"
+        url:
+          type: string
+          format: uri
+          description: URL de la imagen en tamaño completo
+          example: "https://via.placeholder.com/600/92c952"
+        thumbnailUrl:
+          type: string
+          format: uri
+          description: URL de la miniatura
+          example: "https://via.placeholder.com/150/92c952"
+
+    # ========== TODO SCHEMAS ==========
+    Todo:
+      type: object
+      properties:
+        userId:
+          type: integer
+          description: Usuario asignado a la tarea
+          example: 1
+        id:
+          type: integer
+          description: ID único de la tarea
+          example: 1
+        title:
+          type: string
+          description: Descripción de la tarea
+          example: "delectus aut autem"
+        completed:
+          type: boolean
+          description: Estado de completado
+          example: false
+
+    TodoInput:
+      type: object
+      required:
+        - title
+        - completed
+        - userId
+      properties:
+        title:
+          type: string
+          description: Descripción de la tarea
+          example: "Buy milk"
+        completed:
+          type: boolean
+          description: Estado inicial
+          example: false
+        userId:
+          type: integer
+          description: Usuario asignado
+          example: 1
+
+    # ========== USER SCHEMAS ==========
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID único del usuario
+          example: 1
+        name:
+          type: string
+          description: Nombre completo
+          example: "Leanne Graham"
+        username:
+          type: string
+          description: Nombre de usuario único
+          example: "Bret"
+        email:
+          type: string
+          format: email
+          description: Correo electrónico
+          example: "Sincere@april.biz"
+        address:
+          $ref: '#/components/schemas/Address'
+        phone:
+          type: string
+          description: Teléfono de contacto
+          example: "1-770-736-8031 x56442"
+        website:
+          type: string
+          description: Sitio web personal
+          example: "hildegard.org"
+        company:
+          $ref: '#/components/schemas/Company'
+
+    Address:
+      type: object
+      properties:
+        street:
+          type: string
+          description: Nombre de la calle
+          example: "Kulas Light"
+        suite:
+          type: string
+          description: Número de apartamento o suite
+          example: "Apt. 556"
+        city:
+          type: string
+          description: Ciudad
+          example: "Gwenborough"
+        zipcode:
+          type: string
+          description: Código postal
+          example: "92998-3874"
+        geo:
+          $ref: '#/components/schemas/Geo'
+
+    Geo:
+      type: object
+      properties:
+        lat:
+          type: string
+          description: Latitud geográfica
+          example: "-37.3159"
+        lng:
+          type: string
+          description: Longitud geográfica
+          example: "81.1496"
+
+    Company:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Nombre de la empresa
+          example: "Romaguera-Crona"
+        catchPhrase:
+          type: string
+          description: Eslogan de la empresa
+          example: "Multi-layered client-server neural-net"
+        bs:
+          type: string
+          description: Estrategia de negocio
+          example: "harness real-time e-markets"
