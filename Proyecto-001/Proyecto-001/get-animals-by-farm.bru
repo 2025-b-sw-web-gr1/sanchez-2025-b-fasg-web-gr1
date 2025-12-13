@@ -1,0 +1,15 @@
+meta {
+  name: get-animals-by-farm
+  type: http
+  seq: 8
+}
+
+get {
+  url: https://api.granja.com/farms/1/animals
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

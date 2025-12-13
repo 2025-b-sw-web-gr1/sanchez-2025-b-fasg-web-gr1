@@ -1,0 +1,23 @@
+meta {
+  name: create-farm
+  type: http
+  seq: 3
+}
+
+post {
+  url: https://api.granja.com/farms
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "Granja La Pradera",
+    "location": "Valle Sagrado"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

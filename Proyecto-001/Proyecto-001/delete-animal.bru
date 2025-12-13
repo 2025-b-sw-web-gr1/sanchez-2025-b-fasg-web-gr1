@@ -1,0 +1,16 @@
+meta {
+  name: delete-animal
+  type: http
+  seq: 11
+}
+
+delete {
+  url: https://api.granja.com/animals/1
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

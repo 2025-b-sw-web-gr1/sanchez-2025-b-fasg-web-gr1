@@ -1,0 +1,15 @@
+meta {
+  name: get-animal-by-id
+  type: http
+  seq: 7
+}
+
+get {
+  url: https://api.granja.com/animals/1
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

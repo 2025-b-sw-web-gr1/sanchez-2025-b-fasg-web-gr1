@@ -1,0 +1,24 @@
+meta {
+  name: create-animal
+  type: http
+  seq: 9
+}
+
+post {
+  url: https://api.granja.com/animals
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "Betsy",
+    "species": "Vaca",
+    "farmId": 1
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

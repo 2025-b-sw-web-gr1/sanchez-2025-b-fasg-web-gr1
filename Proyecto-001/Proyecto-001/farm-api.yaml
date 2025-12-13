@@ -1,0 +1,198 @@
+openapi: 3.0.0
+info:
+  title: API de Gestión de Granjas
+  version: 1.0.0
+  description: API para administrar granjas y sus animales.
+servers:
+  - url: [https://api.granja.com](https://api.granja.com)
+paths:
+  # --- SECCIÓN DE GRANJAS ---
+  /farms:
+    get:
+      summary: Obtener todas las granjas
+      responses:
+        '200':
+          description: Lista de granjas exitosa
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Farm'
+    post:
+      summary: Crear nueva granja
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FarmInput'
+      responses:
+        '201':
+          description: Granja creada exitosamente
+
+  /farms/{id}:
+    get:
+      summary: Obtener una granja por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Granja encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Farm'
+    put:
+      summary: Actualizar granja
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FarmInput'
+      responses:
+        '200':
+          description: Granja actualizada
+    delete:
+      summary: Eliminar granja
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '204':
+          description: Granja eliminada
+
+  # --- SECCIÓN DE ANIMALES ---
+  /animals:
+    get:
+      summary: Obtener todos los animales
+      responses:
+        '200':
+          description: Lista de animales
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Animal'
+    post:
+      summary: Registrar nuevo animal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnimalInput'
+      responses:
+        '201':
+          description: Animal registrado
+
+  /animals/{id}:
+    get:
+      summary: Obtener animal por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Animal encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Animal'
+    put:
+      summary: Actualizar datos del animal
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnimalInput'
+      responses:
+        '200':
+          description: Animal actualizado
+    delete:
+      summary: Eliminar animal
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '204':
+          description: Animal eliminado
+
+  # --- RELACIÓN 1 A MUCHOS ---
+  /farms/{id}/animals:
+    get:
+      summary: Obtener todos los animales de una granja específica
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Lista de animales de la granja
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Animal'
+
+# --- DEFINICIÓN DE DATOS (MODELOS) ---
+components:
+  schemas:
+    # Modelo de Granja (Para leer)
+    Farm:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string, example: "Granja La Pradera" }
+        location: { type: string, example: "Valle Sagrado" }
+    
+    # Modelo de Granja (Para crear/editar - sin ID)
+    FarmInput:
+      type: object
+      required: [name, location]
+      properties:
+        name: { type: string }
+        location: { type: string }
+
+    # Modelo de Animal (Para leer)
+    Animal:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string, example: "Betsy" }
+        species: { type: string, example: "Vaca" }
+        farmId: { type: integer }
+
+    # Modelo de Animal (Para crear/editar - sin ID)
+    AnimalInput:
+      type: object
+      required: [name, species, farmId]
+      properties:
+        name: { type: string }
+        species: { type: string }
+        farmId: { type: integer }
+

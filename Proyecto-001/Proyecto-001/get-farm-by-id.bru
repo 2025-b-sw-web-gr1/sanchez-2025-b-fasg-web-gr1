@@ -1,0 +1,16 @@
+meta {
+  name: get-farm-by-id
+  type: http
+  seq: 2
+}
+
+get {
+  url: https://api.granja.com/farms/1
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
